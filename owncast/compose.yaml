@@ -1,0 +1,27 @@
+version: "3.4"
+services:
+  owncast:
+    image: gabekangas/owncast:0.2.1
+    container_name: owncast
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 1935:1935
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=frontend
+      - traefik.http.routers.owncast-http.entrypoints=web
+      - traefik.http.routers.owncast-http.rule=Host(`owncast.dragonwolfsp.com`)
+      - traefik.http.routers.owncast-https.entrypoints=websecure
+      - traefik.http.routers.owncast-https.rule=Host(`owncast.dragonwolfsp.com`)
+      - traefik.http.routers.owncast-https.tls=true
+      - traefik.http.routers.owncast-https.tls.certresolver=cloudflare
+      - traefik.http.services.owncast.loadbalancer.server.port=8080
+    volumes:
+      - ./data:/app/data
+    networks:
+      - frontend
+networks:
+  frontend:
+    external: true
